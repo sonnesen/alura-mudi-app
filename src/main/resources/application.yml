@@ -2,12 +2,16 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       dialect: org.hibernate.dialect.MariaDBDialect
-      format-sql: true  
+      hibernate:
+        '[format_sql]': true 
   datasource:
     url: jdbc:mariadb://localhost:3306/mudidb
     username: root
     password: secret
     driver-class-name: org.mariadb.jdbc.Driver  
+    
+  flyway:
+    enabled: true

@@ -1,0 +1,2 @@
+insert into users (username, password, enabled) values ('admin','$2a$10$tRopsDs9eClb68wpz7Sj7.tARgr3Dwb7n2XMQ/NmpxPU3pxURzVzu',1);
+insert into authorities (username, authority) values ('admin', 'ROLE_ADMIN');

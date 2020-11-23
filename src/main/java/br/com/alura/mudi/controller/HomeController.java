@@ -1,13 +1,13 @@
 package br.com.alura.mudi.controller;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -27,26 +27,14 @@ public class HomeController {
 	private final ModelMapper modelMapper;
 
 	@GetMapping
-	public ModelAndView home() {
-		List<Pedido> pedidos = pedidoService.findAll();
-		List<PedidoDTO> dtos = pedidos.stream().map(pedido -> modelMapper.map(pedido, PedidoDTO.class))
-				.collect(Collectors.toList());
-
+	public ModelAndView home(Pageable page) {
+		Sort sort = Sort.by("dataDaEntrega").descending();
+		PageRequest pageRequest = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
+		Page<Pedido> pedidos = pedidoService.findByStatus(StatusPedido.ENTREGUE, pageRequest);
+		Page<PedidoDTO> dtos = pedidos.map(pedido -> modelMapper.map(pedido, PedidoDTO.class));
+		
 		ModelAndView modelAndView = new ModelAndView("home");
 		modelAndView.addObject("pedidos", dtos);
-
-		return modelAndView;
-	}
-
-	@GetMapping("/{status}")
-	public ModelAndView findByStatus(@PathVariable String status) {
-		List<Pedido> pedidos = pedidoService.findByStatus(StatusPedido.valueOf(status.toUpperCase()));
-		List<PedidoDTO> dtos = pedidos.stream().map(pedido -> modelMapper.map(pedido, PedidoDTO.class))
-				.collect(Collectors.toList());
-
-		ModelAndView modelAndView = new ModelAndView("home");
-		modelAndView.addObject("pedidos", dtos);
-		modelAndView.addObject("status", status);
 
 		return modelAndView;
 	}
